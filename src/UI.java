@@ -19,9 +19,17 @@ public class UI extends JFrame {
         panel = new JPanel(new GridLayout(2, 1));
         add(panel);
 
+        inputPanel = new JPanel(new GridLayout(4, 2));
+        add(inputPanel);
+
+        buttonPanel = new JPanel(new FlowLayout());
+        add(buttonPanel);
+
         fileDialogButton = new JButton("CHOOSE DIRECTORY");
         directoryTextField = new JTextField();
         directoryTextField.setEditable(false);
+
+        inputPanel.add(fileDialogButton);
 
         algorithmLabel = new JLabel("Select algorithm:");
         algorithmComboBox = new JComboBox<>(new String[]{"DES-ECB", "DES-CBC", "AES-256-ECB", "AES-256-CBC"});
