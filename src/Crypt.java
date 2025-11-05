@@ -49,4 +49,17 @@ public class Crypt {
         int keySize = algorithm.contains("DES") ? DESKEYSIZE : algorithm.contains("AES") ? AES256KEYSIZE : 0;
         return key.getBytes(StandardCharsets.UTF_8).length == keySize;
     }
+
+    /**
+     * Funzione che ritorna la transformation in base all'algoritmo scelto
+     */
+    private String getTransformation(String algorithm) {
+        return switch (algorithm) {
+            case "DES-ECB" -> "DES/ECB/PKCS5Padding";
+            case "DES-CBC" -> "DES/CBC/PKCS5Padding";
+            case "AES-256-ECB" -> "AES/ECB/PKCS5Padding";
+            case "AES-256-CBC" -> "AES/CBC/PKCS5Padding";
+            default -> throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
+        };
+    }
 }
