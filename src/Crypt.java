@@ -10,9 +10,11 @@ import java.nio.charset.StandardCharsets;
  * Classe per la crittografia e decrittografia dei dati.
  */
 public class Crypt {
-    private final int DESKEYSIZE = 8; // 64 bit
-    private final int AES256KEYSIZE = 32; // 256 bit
-    private final int CBCIVSIZE = 16; // 128 bit
+    private static final int DESKEYSIZE = 8; // 64 bit
+    private static final int AES256KEYSIZE = 32; // 256 bit
+    private static final int CBCIVSIZE = 16; // 128 bit
+    private String TRANSFORMATION;
+
     public Crypt(){}
 
     // Funzione che cifra i dati, ritorna true se tutto ok, atrimenti false
