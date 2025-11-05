@@ -1,7 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.event.ItemEvent;
 import java.io.File;
 
 /**
@@ -53,11 +53,8 @@ public class UI extends JFrame {
 
         // Pulsante per aprire il JFileChooser per selezionare una directory
         fileDialogButton = new JButton("Scegli directory");
-        // Icona standard per le directory, se disponibile
-        Icon dirIcon = UIManager.getIcon("FileView.directoryIcon");
-        if (dirIcon != null) fileDialogButton.setIcon(dirIcon);
-        // Mnemonic e tooltip per accessibilità
-        fileDialogButton.setMnemonic(KeyEvent.VK_D);
+        // Icona standard per le directory
+        fileDialogButton.setIcon(UIManager.getIcon("FileView.directoryIcon"));
         fileDialogButton.setToolTipText("Apri il selettore di directory");
         fileDialogButton.setFont(fieldFont);
 
@@ -104,6 +101,12 @@ public class UI extends JFrame {
         algorithmComboBox.setFont(fieldFont);
         algorithmComboBox.setToolTipText("Scegli l'algoritmo di cifratura");
 
+        algorithmComboBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                ivTextField.setEnabled(e.getItem().toString().contains("CBC"));
+            }
+        });
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0;
@@ -135,6 +138,7 @@ public class UI extends JFrame {
         ivLabel = new JLabel("Enter the IV:");
         ivLabel.setFont(labelFont);
         ivTextField = new JTextField(25);
+        ivTextField.setEnabled(false); // Disabilitato di default, abilitato se CBC selezionato
         ivTextField.setFont(fieldFont);
         ivTextField.setToolTipText("Inserisci il vettore di inizializzazione (IV) se necessario");
 
