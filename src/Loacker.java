@@ -12,13 +12,24 @@ import java.nio.charset.StandardCharsets;
  * rifiuta chiavi/IV troppo lunghi o vuoti.
  */
 public class Loacker {
-    private static final int DESKEYSIZE = 8; // 64 bit
-    private static final int AES256KEYSIZE = 32; // 256 bit
-    private static final int CBCIVSIZE = 16; // 128 bit
+    // Dimensioni richieste per le chiavi/IV in byte
+    private static final int DESKEYSIZE = 8; // 64 bit per DES
+    private static final int AES256KEYSIZE = 32; // 256 bit per AES-256
+    private static final int CBCIVSIZE = 16; // 128 bit IV per CBC
+
+    // Trasformazione selezionata (es. "AES/CBC/PKCS5Padding")
     private String TRANSFORMATION;
 
     public Loacker(){}
 
+    /**
+     * Cripta tutti i file nella directory specificata usando l'algoritmo, la chiave e l'IV forniti.
+     * - Valida input con dataValidation
+     * - Normalizza la chiave/IV se sono più corte (padding con zeri)
+     * - Sovrascrive i file con i dati criptati
+     *
+     * Restituisce true se tutto OK, false in caso di eccezione.
+     */
     public boolean encrypt(File directory, String algorithm, String key, String iv){
         try {
             if (!dataValidation(algorithm, key, iv))
@@ -28,10 +39,13 @@ public class Loacker {
 
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
 
+            // Determina dimensione chiave in base all'algoritmo
             int keySize = algorithm.contains("DES") ? DESKEYSIZE : AES256KEYSIZE;
+            // Normalizza (padd) la chiave se più corta
             byte[] keyBytes = normalizeKeyBytes(key, keySize);
             SecretKey secretKey = new SecretKeySpec(keyBytes, algorithm.split("-")[0]);
 
+            // Se modalità ECB non serve IV, altrimenti crea IvParameterSpec dai bytes normalizzati
             if (algorithm.contains("ECB")) {
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             } else {
@@ -39,14 +53,17 @@ public class Loacker {
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
             }
 
+            // Controlla che la directory sia valida
             if (directory == null || !directory.isDirectory())
                 throw new IllegalArgumentException("Invalid directory");
 
             File[] files = directory.listFiles();
             if (files == null) return false;
 
+            // Itera sui file presenti nella directory (non entra nelle sottodirectory)
             for (File file : files) {
                 if (!file.isFile()) continue;
+                // Legge contenuto, lo cifra e sovrascrive il file
                 byte[] bytes = Files.readAllBytes(file.toPath());
                 byte[] encryptedData = cipher.doFinal(bytes);
                 Files.write(file.toPath(), encryptedData);
@@ -54,10 +71,15 @@ public class Loacker {
 
             return true;
         } catch (Exception e) {
+            // In caso di errore qualsiasi viene restituito false
             return false;
         }
     }
 
+    /**
+     * Decifra tutti i file nella directory specificata.
+     * Stessa logica di encrypt ma con Cipher.DECRYPT_MODE.
+     */
     public boolean decrypt(File directory, String algorithm, String key, String iv){
         try {
             if (!dataValidation(algorithm, key, iv))
@@ -97,6 +119,14 @@ public class Loacker {
         }
     }
 
+    /**
+     * Valida gli input:
+     * - algorithm e key non nulli
+     * - la chiave non deve essere vuota né più lunga della dimensione richiesta
+     * - se CBC: l'IV non deve essere vuoto né più lungo del CBCIVSIZE
+     *
+     * Ritorna true se gli input sono accettabili per la normalizzazione successiva.
+     */
     private boolean dataValidation(String algorithm, String key, String iv) {
         if (algorithm == null || key == null) return false;
 
@@ -116,6 +146,10 @@ public class Loacker {
         return true;
     }
 
+    /**
+     * Normalizza la chiave: crea un array di dimensione richiesta,
+     * copia i byte forniti e lascia zeri per il padding se necessari.
+     */
     private byte[] normalizeKeyBytes(String key, int requiredSize) {
         byte[] provided = key.getBytes(StandardCharsets.UTF_8);
         byte[] result = new byte[requiredSize];
@@ -125,6 +159,9 @@ public class Loacker {
         return result;
     }
 
+    /**
+     * Normalizza l'IV in modo simile alla chiave (padding con zeri fino a CBCIVSIZE).
+     */
     private byte[] normalizeIVBytes(String iv) {
         byte[] provided = iv.getBytes(StandardCharsets.UTF_8);
         byte[] result = new byte[CBCIVSIZE];
@@ -134,6 +171,10 @@ public class Loacker {
         return result;
     }
 
+    /**
+     * Mappa la stringa dell'algoritmo selezionato alla trasformazione completa richiesta da Cipher.
+     * Lancia IllegalArgumentException se l'algoritmo non è supportato.
+     */
     private String getTransformation(String algorithm) {
         return switch (algorithm) {
             case "DES-ECB" -> "DES/ECB/PKCS5Padding";
