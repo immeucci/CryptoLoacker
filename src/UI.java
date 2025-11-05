@@ -24,8 +24,13 @@ public class UI extends JFrame {
     // Directory scelta dall'utente (oggetto File)
     private File choosenDirectory;
 
+    // Istanza di Loacker per operazioni di cifratura/decifratura
+    private Loacker loacker;
+
     // Costruttore: costruisce e dispone tutti i componenti UI
     public UI() {
+        loacker = new Loacker();
+
         setTitle("Crypto Loacker");
         // Imposta comportamento di chiusura finestra
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -165,8 +170,11 @@ public class UI extends JFrame {
             String algorithm = (String) algorithmComboBox.getSelectedItem();
             String key = keyTextField.getText();
             String iv = ivTextField.getText();
-            Loacker loacker = new Loacker(choosenDirectory, algorithm, key, iv);
-            //loacker.encrypt();
+            if (loacker.encrypt(choosenDirectory, algorithm, key, iv)) {
+                JOptionPane.showMessageDialog(this, "Encryption successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Encryption failed! Please check your inputs.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         // Azione DECRYPT: crea istanza di Loacker con i parametri correnti
@@ -174,8 +182,11 @@ public class UI extends JFrame {
             String algorithm = (String) algorithmComboBox.getSelectedItem();
             String key = keyTextField.getText();
             String iv = ivTextField.getText();
-            Loacker loacker = new Loacker(choosenDirectory, algorithm, key, iv);
-            //loacker.decrypt();
+            if (loacker.decrypt(choosenDirectory, algorithm, key, iv)) {
+                JOptionPane.showMessageDialog(this, "Decryption successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Decryption failed! Please check your inputs.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         // Aggiunge i pulsanti al pannello inferiore

@@ -91,12 +91,12 @@ public class Loacker {
      */
     private boolean dataValidation(String algorithm, String key, String iv) {
         // Controlla la linghezza dell'IV se l'algoritmo utilizza la modalità CBC
-        if (algorithm.contains("CBC") && iv.getBytes(StandardCharsets.UTF_8).length != CBCIVSIZE)
+        if (algorithm.contains("CBC") && iv.getBytes(StandardCharsets.UTF_8).length > CBCIVSIZE)
             return false;
 
         // Controlla la lunghezza della chiave in base all'algoritmo scelto con un operatore ternario
         int keySize = algorithm.contains("DES") ? DESKEYSIZE : algorithm.contains("AES") ? AES256KEYSIZE : 0;
-        return key.getBytes(StandardCharsets.UTF_8).length == keySize;
+        return key.getBytes(StandardCharsets.UTF_8).length > keySize;
     }
 
     /**
