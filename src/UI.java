@@ -10,22 +10,22 @@ import java.io.File;
  */
 public class UI extends JFrame {
     // Panel principali
-    private JPanel panel, buttonPanel, inputPanel;
+    private final JPanel panel, buttonPanel, inputPanel;
 
     // Pulsanti principali
-    private JButton encryptButton, decryptButton;
-    private JButton fileDialogButton;
+    private final JButton encryptButton, decryptButton;
+    private final JButton fileDialogButton;
 
     // Etichette e campi input
-    private JLabel algorithmLabel, keyLabel, ivLabel;
-    private JComboBox<String> algorithmComboBox;
+    private final JLabel algorithmLabel, keyLabel, ivLabel;
+    private final JComboBox<String> algorithmComboBox;
     private JTextField keyTextField, ivTextField, directoryTextField;
 
     // Directory scelta dall'utente (oggetto File)
     private File choosenDirectory;
 
     // Istanza di Loacker per operazioni di cifratura/decifratura
-    private Loacker loacker;
+    private final Loacker loacker;
 
     // Costruttore: costruisce e dispone tutti i componenti UI
     public UI() {
@@ -64,7 +64,7 @@ public class UI extends JFrame {
         fileDialogButton.setFont(fieldFont);
 
         // Azione del pulsante: apre JFileChooser in modalità directory-only
-        fileDialogButton.addActionListener(e -> {
+        fileDialogButton.addActionListener(_ -> {
             JFileChooser chooser = new JFileChooser();
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             chooser.setDialogTitle("Select Directory");
@@ -166,7 +166,7 @@ public class UI extends JFrame {
         decryptButton.setToolTipText("Avvia la decifratura");
 
         // Azione ENCRYPT: crea istanza di Loacker con i parametri correnti
-        encryptButton.addActionListener(e -> {
+        encryptButton.addActionListener(_ -> {
             String algorithm = (String) algorithmComboBox.getSelectedItem();
             String key = keyTextField.getText();
             String iv = ivTextField.getText();
@@ -178,7 +178,7 @@ public class UI extends JFrame {
         });
 
         // Azione DECRYPT: crea istanza di Loacker con i parametri correnti
-        decryptButton.addActionListener(e -> {
+        decryptButton.addActionListener(_ -> {
             String algorithm = (String) algorithmComboBox.getSelectedItem();
             String key = keyTextField.getText();
             String iv = ivTextField.getText();

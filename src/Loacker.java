@@ -27,7 +27,6 @@ public class Loacker {
      * - Valida input con dataValidation
      * - Normalizza la chiave/IV se sono più corte (padding con zeri)
      * - Sovrascrive i file con i dati criptati
-     *
      * Restituisce true se tutto OK, false in caso di eccezione.
      */
     public boolean encrypt(File directory, String algorithm, String key, String iv){
@@ -63,10 +62,14 @@ public class Loacker {
             // Itera sui file presenti nella directory (non entra nelle sottodirectory)
             for (File file : files) {
                 if (!file.isFile()) continue;
-                // Legge contenuto, lo cifra e sovrascrive il file
+
+                // Legge contenuto, lo cifra e lo inserisce in nuovo file .loacker
                 byte[] bytes = Files.readAllBytes(file.toPath());
                 byte[] encryptedData = cipher.doFinal(bytes);
-                Files.write(file.toPath(), encryptedData);
+
+                File target = new File(file.getParentFile(), file.getName() + ".loacker");
+                Files.write(target.toPath(), encryptedData);
+                Files.delete(file.toPath());
             }
 
             return true;
@@ -108,9 +111,18 @@ public class Loacker {
 
             for (File file : files) {
                 if (!file.isFile()) continue;
+                if (!file.getName().endsWith(".loacker")) continue;
+
+                // Nome originale del file
+                String name = file.getName();
+                // Sottrae al nome del file l'estensione .loacker
+                String originalName = name.substring(0, name.length() - ".loacker".length());
+
                 byte[] bytes = Files.readAllBytes(file.toPath());
                 byte[] decryptedData = cipher.doFinal(bytes);
-                Files.write(file.toPath(), decryptedData);
+                File target = new File(file.getParentFile(), originalName);
+                Files.write(target.toPath(), decryptedData);
+                Files.delete(file.toPath());
             }
 
             return true;
@@ -124,7 +136,6 @@ public class Loacker {
      * - algorithm e key non nulli
      * - la chiave non deve essere vuota né più lunga della dimensione richiesta
      * - se CBC: l'IV non deve essere vuoto né più lungo del CBCIVSIZE
-     *
      * Ritorna true se gli input sono accettabili per la normalizzazione successiva.
      */
     private boolean dataValidation(String algorithm, String key, String iv) {
