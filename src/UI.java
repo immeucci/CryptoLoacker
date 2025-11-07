@@ -106,6 +106,7 @@ public class UI extends JFrame {
         algorithmComboBox.setFont(fieldFont);
         algorithmComboBox.setToolTipText("Scegli l'algoritmo di cifratura");
 
+        // Abilita il campo IV solo quando l'algoritmo selezionato contiene "CBC", altrimenti lo disabilita.
         algorithmComboBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 ivTextField.setEnabled(e.getItem().toString().contains("CBC"));

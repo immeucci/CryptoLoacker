@@ -34,8 +34,10 @@ public class Loacker {
             if (!dataValidation(algorithm, key, iv))
                 throw new IllegalArgumentException("Invalid inputs");
 
+            // Seleziona la trasformazione corrispondente all'algoritmo.
             TRANSFORMATION = getTransformation(algorithm);
 
+            // Ottiene un'istanza di Cipher per la trasformazione selezionata.
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
 
             // Determina dimensione chiave in base all'algoritmo
@@ -88,8 +90,10 @@ public class Loacker {
             if (!dataValidation(algorithm, key, iv))
                 throw new IllegalArgumentException("Invalid inputs");
 
+            // Seleziona la trasformazione corrispondente all'algoritmo.
             TRANSFORMATION = getTransformation(algorithm);
 
+            // Ottiene un'istanza di Cipher per la trasformazione selezionata.
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
 
             int keySize = algorithm.contains("DES") ? DESKEYSIZE : AES256KEYSIZE;
